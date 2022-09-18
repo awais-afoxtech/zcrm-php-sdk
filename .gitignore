@@ -4,4 +4,4 @@
 /vendor
 /.settings
 composer.lock
-.idea
+/.idea

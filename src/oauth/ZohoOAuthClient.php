@@ -2,6 +2,7 @@
 namespace zcrmsdk\oauth;
 
 
+use Exception;
 use zcrmsdk\crm\utility\Logger;
 use zcrmsdk\oauth\exception\ZohoOAuthException;
 use zcrmsdk\oauth\utility\ZohoOAuthConstants;
@@ -11,7 +12,7 @@ use zcrmsdk\oauth\utility\ZohoOAuthTokens;
 class ZohoOAuthClient
 {
     
-    private $zohoOAuthParams;
+    private mixed $zohoOAuthParams;
     
     private static $zohoOAuthClient;
     
@@ -20,7 +21,7 @@ class ZohoOAuthClient
         $this->zohoOAuthParams = $params;
     }
 
-    public static function getInstance($params)
+    public static function getInstance($params): ZohoOAuthClient
     {
         self::$zohoOAuthClient = new ZohoOAuthClient($params);
         return self::$zohoOAuthClient;
@@ -30,7 +31,11 @@ class ZohoOAuthClient
     {
         return self::$zohoOAuthClient;
     }
-    
+
+    /**
+     * @throws ZohoOAuthException
+     * @throws Exception
+     */
     public function getAccessToken($userEmailId)
     {
         $persistence = ZohoOAuth::getPersistenceHandlerInstance();
@@ -48,8 +53,11 @@ class ZohoOAuthClient
             return $tokens->getAccessToken();
         }
     }
-    
-    public function generateAccessToken($grantToken)
+
+    /**
+     * @throws ZohoOAuthException
+     */
+    public function generateAccessToken($grantToken): ZohoOAuthTokens
     {
         if ($grantToken == null) {
             throw new ZohoOAuthException("Grant Token is not provided.");
@@ -72,13 +80,20 @@ class ZohoOAuthClient
             throw new ZohoOAuthException($ex);
         }
     }
-    
-    public function generateAccessTokenFromRefreshToken($refreshToken, $userEmailId)
+
+    /**
+     * @throws ZohoOAuthException
+     */
+    public function generateAccessTokenFromRefreshToken($refreshToken, $userEmailId): void
     {
         self::refreshAccessToken($refreshToken, $userEmailId);
     }
-    
-    public function refreshAccessToken($refreshToken, $userEmailId)
+
+    /**
+     * @throws ZohoOAuthException
+     * @throws Exception
+     */
+    public function refreshAccessToken($refreshToken, $userEmailId): ZohoOAuthTokens
     {
         
         if ($refreshToken == null) {
@@ -104,7 +119,7 @@ class ZohoOAuthClient
         }
     }
     
-    private function getZohoConnector($url)
+    private function getZohoConnector($url): ZohoOAuthHTTPConnector
     {
         $zohoHttpCon = new ZohoOAuthHTTPConnector();
         $zohoHttpCon->setUrl($url);
@@ -114,7 +129,7 @@ class ZohoOAuthClient
         return $zohoHttpCon;
     }
     
-    private function getTokensFromJSON($responseObj)
+    private function getTokensFromJSON($responseObj): ZohoOAuthTokens
     {
         $oAuthTokens = new ZohoOAuthTokens();
         $expiresIn = $responseObj[ZohoOAuthConstants::EXPIRES_IN];
@@ -130,13 +145,13 @@ class ZohoOAuthClient
         }
         return $oAuthTokens;
     }
-    
+
     /**
      * zohoOAuthParams
      *
-     * @return
+     * @return mixed
      */
-    public function getZohoOAuthParams()
+    public function getZohoOAuthParams(): mixed
     {
         return $this->zohoOAuthParams;
     }
@@ -146,11 +161,14 @@ class ZohoOAuthClient
      *
      * @param $zohoOAuthParams
      */
-    public function setZohoOAuthParams($zohoOAuthParams)
+    public function setZohoOAuthParams($zohoOAuthParams): void
     {
         $this->zohoOAuthParams = $zohoOAuthParams;
     }
-    
+
+    /**
+     * @throws ZohoOAuthException
+     */
     public function getUserEmailIdFromIAM($accessToken)
     {
         $connector = new ZohoOAuthHTTPConnector();
@@ -167,8 +185,7 @@ class ZohoOAuthClient
     public function processResponse($apiResponse)
     {
         list ($headers, $content) = explode("\r\n\r\n", $apiResponse, 2);
-        $jsonResponse = json_decode($content, true);
-        
-        return $jsonResponse;
+
+        return json_decode($content, true);
     }
 }
