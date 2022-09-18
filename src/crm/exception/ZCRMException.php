@@ -2,27 +2,28 @@
 
 namespace zcrmsdk\crm\exception;
 
-class ZCRMException extends \Exception
-{
+use Exception;
+use Throwable;
 
+class ZCRMException extends Exception
+{
     protected $message = 'Unknown exception';
 
     private string $exceptionCode = "Unknown";
 
     private array $exceptionDetails = array();
 
-    public function __construct($message = null, $code = 0)
+    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null)
     {
-        if ( ! $message) {
+        if ( empty($message)) {
             throw new $this('Unknown '.get_class($this));
         }
-        parent::__construct($message, $code);
+        parent::__construct($message, $code, $previous);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return get_class($this)." Caused by:'{$this->message}' in {$this->file}({$this->line})\n"
-               ."{$this->getTraceAsString()}";
+        return get_class($this)." Caused by:'{$this->message}' in {$this->file}({$this->line})\n"."{$this->getTraceAsString()}";
     }
 
     /**
