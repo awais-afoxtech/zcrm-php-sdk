@@ -37,7 +37,7 @@ class MetaDataAPIHandler extends APIHandler
             $responseData = array();
             foreach ($modulesArray as $eachmodule) {
                 $module = self::getZCRMModule($eachmodule);
-                array_push($responseData, $module);
+                $responseData[] = $module;
             }
             $responseInstance->setData($responseData);
             
@@ -103,7 +103,7 @@ class MetaDataAPIHandler extends APIHandler
         $profileArray = $moduleDetails['profiles'];
         $profileInstanceArray = array();
         foreach ($profileArray as $eachProfile) {
-            array_push($profileInstanceArray, ZCRMProfile::getInstance($eachProfile['id'], $eachProfile['name']));
+            $profileInstanceArray[] = ZCRMProfile::getInstance($eachProfile['id'], $eachProfile['name']);
         }
         $crmModuleInstance->setAllProfiles($profileInstanceArray);
         
@@ -116,7 +116,7 @@ class MetaDataAPIHandler extends APIHandler
             $relatedListInstanceArray = array();
             foreach ($relatedListArray as $relatedListObj) {
                 $moduleRelatedListIns = ZCRMModuleRelatedList::getInstance($relatedListObj['api_name']);
-                array_push($relatedListInstanceArray, $moduleRelatedListIns->setRelatedListProperties($relatedListObj));
+                $relatedListInstanceArray[] = $moduleRelatedListIns->setRelatedListProperties($relatedListObj);
             }
         }
         $crmModuleInstance->setRelatedLists($relatedListInstanceArray);
@@ -167,8 +167,8 @@ class MetaDataAPIHandler extends APIHandler
     public function constructCriteria($criteria,&$index)
     {
         $criteria_instance=ZCRMCustomViewCriteria::getInstance();
-        $criteria_instance->setField(isset($criteria['field'])? $criteria['field'] : null);
-        $criteria_instance->setComparator(isset($criteria['comparator'])? $criteria['comparator'] : null);
+        $criteria_instance->setField($criteria['field'] ?? null);
+        $criteria_instance->setComparator($criteria['comparator'] ?? null);
         if(isset($criteria['value']))
         {
             $criteria_instance->setValue($criteria['value']);
@@ -182,7 +182,7 @@ class MetaDataAPIHandler extends APIHandler
         {
             for ($x = 0; $x < count($criteria['group']); $x++) {
                 $ins=self::constructCriteria($criteria['group'][$x],$index);
-                array_push($group_criteria,$ins);
+                $group_criteria[] = $ins;
             }
         }
         if($group_criteria!=null)
@@ -230,11 +230,11 @@ class MetaDataAPIHandler extends APIHandler
         $customViewInstance->setDefault((boolean) $customViewDetails['default']);
         $customViewInstance->setName($customViewDetails['name']);
         $customViewInstance->setSystemName($customViewDetails['system_name']);
-        $customViewInstance->setSortBy(isset($customViewDetails['sort_by']) ? $customViewDetails['sort_by'] : null);
-        $customViewInstance->setCategory(isset($customViewDetails['category']) ? $customViewDetails['category'] : null);
-        $customViewInstance->setFields(isset($customViewDetails['fields']) ? $customViewDetails['fields'] : null);
-        $customViewInstance->setFavorite(isset($customViewDetails['favorite']) ? $customViewDetails['favorite'] : null);
-        $customViewInstance->setSortOrder(isset($customViewDetails['sort_order']) ? $customViewDetails['sort_order'] : null);
+        $customViewInstance->setSortBy($customViewDetails['sort_by'] ?? null);
+        $customViewInstance->setCategory($customViewDetails['category'] ?? null);
+        $customViewInstance->setFields($customViewDetails['fields'] ?? null);
+        $customViewInstance->setFavorite($customViewDetails['favorite'] ?? null);
+        $customViewInstance->setSortOrder($customViewDetails['sort_order'] ?? null);
         if (isset($customViewDetails['criteria']) && $customViewDetails['criteria'] != null) {
             $index=1;
             $criteriaInstance = self::constructCriteria($customViewDetails['criteria'], $index);
@@ -248,7 +248,7 @@ class MetaDataAPIHandler extends APIHandler
                 $customViewCategoryIns = ZCRMCustomViewCategory::getInstance();
                 $customViewCategoryIns->setDisplayValue($value);
                 $customViewCategoryIns->setActualValue($key);
-                array_push($categoryInstanceArray, $customViewCategoryIns);
+                $categoryInstanceArray[] = $customViewCategoryIns;
             }
             $customViewInstance->setCategoriesList($categoryInstanceArray);
         }

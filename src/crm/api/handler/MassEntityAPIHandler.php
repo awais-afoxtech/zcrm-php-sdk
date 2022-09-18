@@ -23,8 +23,11 @@ class MassEntityAPIHandler extends APIHandler
     {
         return new MassEntityAPIHandler($moduleInstance);
     }
-    
-    public function createRecords($records, $trigger,$lar_id,$process)
+
+    /**
+     * @throws ZCRMException
+     */
+    public function createRecords($records, $trigger,$lar_id,$process): \zcrmsdk\crm\api\response\BulkAPIResponse
     {
         if (sizeof($records) > 100) {
             throw new ZCRMException(APIConstants::API_MAX_RECORDS_MSG, APIConstants::RESPONSECODE_BAD_REQUEST);
@@ -37,19 +40,19 @@ class MassEntityAPIHandler extends APIHandler
             $dataArray = array();
             foreach ($records as $record) {
                 if ($record->getEntityId() == null) {
-                    array_push($dataArray, EntityAPIHandler::getInstance($record)->getZCRMRecordAsJSON());
+                    $dataArray[] = EntityAPIHandler::getInstance($record)->getZCRMRecordAsJSON();
                 } else {
                     throw new ZCRMException("Entity ID MUST be null for create operation.", APIConstants::RESPONSECODE_BAD_REQUEST);
                 }
             }
             $requestBodyObj["data"] = $dataArray;
-            if ($trigger !== null && is_array($trigger)) {
+            if (is_array($trigger)) {
                 $requestBodyObj["trigger"] = $trigger;
             }
             if ($lar_id !== null) {
                 $requestBodyObj["lar_id"] = $lar_id;
             }
-            if($process !== null && is_array($process) ){
+            if(is_array($process)){
                 $requestBodyObj["process"] =$process;
             }
             
@@ -67,7 +70,7 @@ class MassEntityAPIHandler extends APIHandler
                     $recordDetails = $responseData["details"];
                     $newRecord = $records[$i];
                     EntityAPIHandler::getInstance($newRecord)->setRecordProperties($recordDetails);
-                    array_push($createdRecords, $newRecord);
+                    $createdRecords[] = $newRecord;
                     $entityResIns->setData($newRecord);
                 } else {
                     $entityResIns->setData(null);

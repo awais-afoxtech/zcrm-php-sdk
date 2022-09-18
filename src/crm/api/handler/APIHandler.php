@@ -51,7 +51,7 @@ class APIHandler implements APIHandlerInterface
             );
         } else {
             $valArray = $this->requestParams[$key];
-            array_push($valArray, $value);
+            $valArray[] = $value;
             $this->requestParams[$key] = $valArray;
         }
     }
