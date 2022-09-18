@@ -38,7 +38,8 @@ class APIRequest
     
     private function __construct($apiHandler)
     {
-        if(strpos($apiHandler->getUrlPath(), "content")!== false || strpos($apiHandler->getUrlPath(), "upload")!== false || strpos($apiHandler->getUrlPath(), 'bulk-write')!== false)
+        if(str_contains($apiHandler->getUrlPath(), "content") || str_contains($apiHandler->getUrlPath(), "upload")
+           || str_contains($apiHandler->getUrlPath(), 'bulk-write'))
         {
             self::setUrl($apiHandler->getUrlPath());
         }
@@ -46,7 +47,7 @@ class APIRequest
         {
             self::constructAPIUrl($apiHandler);
             self::setUrl($this->url . $apiHandler->getUrlPath());
-            if (substr($apiHandler->getUrlPath(), 0, 4) !== "http")
+            if ( ! str_starts_with($apiHandler->getUrlPath(), "http"))
             {
                 self::setUrl("https://" . $this->url);
             }
@@ -58,16 +59,15 @@ class APIRequest
         self::setApiKey($apiHandler->getApiKey());
     }
     
-    public static function getInstance($apiHandler)
+    public static function getInstance($apiHandler): APIRequest
     {
-        $instance = new APIRequest($apiHandler);
-        return $instance;
+        return new APIRequest($apiHandler);
     }
     
     /**
      * Method to construct the API Url
      */
-    public function constructAPIUrl($apiHandler)
+    public function constructAPIUrl($apiHandler): void
     {
         $hitSandbox = ZCRMConfigUtil::getConfigValue('sandbox');
         $baseUrl = strcasecmp($hitSandbox, "true") == 0 ? str_replace('www', 'sandbox', ZCRMConfigUtil::getAPIBaseUrl()) : ZCRMConfigUtil::getAPIBaseUrl();
