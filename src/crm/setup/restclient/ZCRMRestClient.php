@@ -116,7 +116,7 @@ class ZCRMRestClient
      *
      * @return ZCRMRecord instance of the ZCRMRecord class
      */
-    public function getRecordInstance(string $moduleAPIName, string $entityId): ZCRMRecord
+    public function getRecordInstance(string $moduleAPIName, string $entityId = ''): ZCRMRecord
     {
         return ZCRMRecord::getInstance($moduleAPIName, $entityId);
     }

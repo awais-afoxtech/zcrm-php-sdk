@@ -165,10 +165,10 @@ class ZCRMRecord
     /**
      * constructor to set the module name and record id
      *
-     * @param String $module
-     * @param string $entityId
+     * @param  string  $module
+     * @param  string  $entityId
      */
-    private function __construct($module, $entityId)
+    private function __construct(string $module, string $entityId = '')
     {
         $this->moduleApiName = $module;
         $this->entityId = $entityId;
@@ -177,11 +177,12 @@ class ZCRMRecord
     /**
      * Method to get the instance of the ZCRMRecord class
      *
-     * @param String $module api name of the module
-     * @param string $entityId the record id
-     * @return ZCRMRecord-instance
+     * @param  string  $module api name of the module
+     * @param  string  $entityId the record id
+     *
+     * @return ZCRMRecord
      */
-    public static function getInstance($module, $entityId)
+    public static function getInstance(string $module, string $entityId = ''): ZCRMRecord
     {
         return new ZCRMRecord($module, $entityId);
     }
