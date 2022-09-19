@@ -112,11 +112,11 @@ class ZCRMRestClient
      * method to get the record of the client
      *
      * @param  string  $moduleAPIName  module api name
-     * @param  string  $entityId  record id
+     * @param  ?string  $entityId  record id
      *
      * @return ZCRMRecord instance of the ZCRMRecord class
      */
-    public function getRecordInstance(string $moduleAPIName, string $entityId = ''): ZCRMRecord
+    public function getRecordInstance(string $moduleAPIName, ?string $entityId): ZCRMRecord
     {
         return ZCRMRecord::getInstance($moduleAPIName, $entityId);
     }
