@@ -1,4 +1,5 @@
 <?php
+
 namespace zcrmsdk\crm\api\response;
 
 use zcrmsdk\crm\utility\APIConstants;
@@ -6,58 +7,58 @@ use zcrmsdk\crm\exception\APIExceptionHandler;
 
 class CommonAPIResponse
 {
-    
+
     /**
      * http status code
      *
      * @var int
      */
     private $httpStatusCode = null;
-    
+
     /**
      * response Json
      *
      * @var object
      */
     private $responseJSON = null;
-    
+
     /**
      * response headers
      *
      * @var array
      */
     private $responseHeaders = null;
-    
+
     /**
      * response code
      *
      * @var string
      */
     private $code = null;
-    
+
     /**
      * response message
      *
      * @var string
      */
     private $message = null;
-    
+
     /**
      * response details
      *
      * @var array
      */
     private $details = null;
-    
+
     /**
      * the entire response
      *
      * @var string
      */
     private $response = null;
-    
+
     private $apiName = null;
-    
+
     public function __construct($response, $httpStatusCode, $apiName = null)
     {
         $this->apiName = $apiName;
@@ -66,7 +67,7 @@ class CommonAPIResponse
         $this->setResponseJSON();
         $this->processResponse();
     }
-    
+
     /**
      * method to process the api response
      */
@@ -74,11 +75,13 @@ class CommonAPIResponse
     {
         if (in_array($this->httpStatusCode, APIExceptionHandler::getFaultyResponseCodes())) {
             $this->handleForFaultyResponses();
-        } else if ($this->httpStatusCode == APIConstants::RESPONSECODE_ACCEPTED || $this->httpStatusCode == APIConstants::RESPONSECODE_OK || $this->httpStatusCode == APIConstants::RESPONSECODE_CREATED) {
+        } elseif ($this->httpStatusCode == APIConstants::RESPONSECODE_ACCEPTED
+                  || $this->httpStatusCode == APIConstants::RESPONSECODE_OK
+                  || $this->httpStatusCode == APIConstants::RESPONSECODE_CREATED) {
             $this->processResponseData();
         }
     }
-    
+
     /**
      * method to check whether any faulty api response has occured and handles it accordingly
      */
@@ -86,7 +89,7 @@ class CommonAPIResponse
     {
         return;
     }
-    
+
     /**
      * method to process the correct api response
      */
@@ -94,12 +97,14 @@ class CommonAPIResponse
     {
         return;
     }
-    
+
     public function setResponseJSON()
     {
-        if ($this->httpStatusCode == APIConstants::RESPONSECODE_NO_CONTENT || $this->httpStatusCode == APIConstants::RESPONSECODE_NOT_MODIFIED) {
+        if ($this->httpStatusCode == APIConstants::RESPONSECODE_NO_CONTENT
+            || $this->httpStatusCode == APIConstants::RESPONSECODE_NOT_MODIFIED) {
             $this->responseJSON = array();
             $this->responseHeaders = array();
+
             return;
         }
         list ($headers, $content) = explode("\r\n\r\n", $this->response, 2);
@@ -120,17 +125,17 @@ class CommonAPIResponse
         $this->responseJSON = $jsonResponse;
         $this->responseHeaders = $headerMap;
     }
-    
+
     /**
      * method to set the http status code
      *
-     * @param int $statusCode the http status code
+     * @param  int  $statusCode  the http status code
      */
     public function setHttpStatusCode($statusCode)
     {
         $this->httpStatusCode = $statusCode;
     }
-    
+
     /**
      * method to get the http status code
      *
@@ -140,7 +145,7 @@ class CommonAPIResponse
     {
         return $this->httpStatusCode;
     }
-    
+
     /**
      * method to get the json response
      *
@@ -150,17 +155,17 @@ class CommonAPIResponse
     {
         return $this->responseJSON;
     }
-    
+
     /**
      * method to set the response headers
      *
-     * @param array $responseHeader  array of response headers
+     * @param  array  $responseHeader  array of response headers
      */
     public function setResponseHeaders($responseHeader)
     {
         $this->responseHeaders = $responseHeader;
     }
-    
+
     /**
      * method to get the response headers
      *
@@ -170,7 +175,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders;
     }
-    
+
     /**
      * method to get the expiry time of the access token
      *
@@ -180,7 +185,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::ACCESS_TOKEN_EXPIRY];
     }
-    
+
     /**
      * method to get the api limit for the current window
      *
@@ -190,7 +195,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::CURR_WINDOW_API_LIMIT];
     }
-    
+
     /**
      * method to get the remaining api count for the current window
      *
@@ -200,7 +205,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::CURR_WINDOW_REMAINING_API_COUNT];
     }
-    
+
     /**
      * method to get the reset time of the current window in milli seconds
      *
@@ -210,7 +215,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::CURR_WINDOW_RESET];
     }
-    
+
     /**
      * method to get the remaining api count for the day
      *
@@ -220,7 +225,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::API_COUNT_REMAINING_FOR_THE_DAY];
     }
-    
+
     /**
      * method to get the api limit of the day
      *
@@ -230,7 +235,7 @@ class CommonAPIResponse
     {
         return $this->responseHeaders[APIConstants::API_LIMIT_FOR_THE_DAY];
     }
-    
+
     /**
      * method to Get the response code like SUCCESS,INVALID_DATA,..etc
      *
@@ -240,18 +245,18 @@ class CommonAPIResponse
     {
         return $this->code;
     }
-    
+
     /**
      * method to set the response code like SUCCESS,INVALID_DATA,..etc
      *
-     * @param String $code
+     * @param  String  $code
      *            the response code like SUCCESS,INVALID_DATA,..etc
      */
     public function setCode($code)
     {
         $this->code = $code;
     }
-    
+
     /**
      * method to Get the response message
      *
@@ -261,18 +266,18 @@ class CommonAPIResponse
     {
         return $this->message;
     }
-    
+
     /**
      * method to Set the response message
      *
-     * @param String $message
+     * @param  String  $message
      *            the response message
      */
     public function setMessage($message)
     {
         $this->message = $message;
     }
-    
+
     /**
      * method to Get the extra details of response (if any)
      *
@@ -282,18 +287,18 @@ class CommonAPIResponse
     {
         return $this->details;
     }
-    
+
     /**
      * method to Set the extra details for response (if any)
      *
-     * @param Array $details
+     * @param  Array  $details
      *            array containing the extra details of the response
      */
     public function setDetails($details)
     {
         $this->details = $details;
     }
-    
+
     /**
      * method to get the response
      *
@@ -303,18 +308,18 @@ class CommonAPIResponse
     {
         return $this->response;
     }
-    
+
     /**
      * methdo to set the response
      *
-     * @param string $response
+     * @param  string  $response
      *            the entire response
      */
     public function setResponse($response)
     {
         $this->response = $response;
     }
-    
+
     /**
      * method to get the api name
      *

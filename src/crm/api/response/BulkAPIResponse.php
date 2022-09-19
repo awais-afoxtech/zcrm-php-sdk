@@ -7,35 +7,35 @@ use zcrmsdk\crm\utility\APIConstants;
 
 class BulkAPIResponse extends CommonAPIResponse
 {
-    
+
     /**
      * the bulk data
      *
      * @var array
      */
     private $bulkData = null;
-    
+
     /**
      * response status of the api
      *
      * @var string
      */
     private $status = null;
-    
+
     /**
      * the response information
      *
      * @var ResponseInfo
      */
     private $info = null;
-    
+
     /**
      * bulk entities response
      *
      * @var array array of EntityResponse instances
      */
     private $bulkEntitiesResponse = null;
-    
+
     /**
      * constructor to set the http response and http status code
      *
@@ -47,7 +47,7 @@ class BulkAPIResponse extends CommonAPIResponse
         parent::__construct($httpResponse, $httpStatusCode);
         $this->setInfo();
     }
-    
+
     /**
      *
      * {@inheritdoc}
@@ -76,7 +76,7 @@ class BulkAPIResponse extends CommonAPIResponse
             }
         }
     }
-    
+
     /**
      *
      * {@inheritdoc}
@@ -103,7 +103,7 @@ class BulkAPIResponse extends CommonAPIResponse
             }
         }
         if (array_key_exists(APIConstants::TAXES, $bulkResponseJSON)) {
-            
+
             $orgTaxesArray= $bulkResponseJSON[APIConstants::TAXES];
             foreach ($orgTaxesArray as $orgTax) {
                 if ($orgTax != null && array_key_exists(APIConstants::STATUS, $orgTax)) {
@@ -112,7 +112,7 @@ class BulkAPIResponse extends CommonAPIResponse
             }
         }
         if (array_key_exists(APIConstants::VARIABLES, $bulkResponseJSON)) {
-            
+
             $variables= $bulkResponseJSON[APIConstants::VARIABLES];
             foreach ($variables as $variable) {
                 if ($variable != null && array_key_exists(APIConstants::STATUS, $variable)) {
@@ -121,7 +121,7 @@ class BulkAPIResponse extends CommonAPIResponse
             }
         }
     }
-    
+
     /**
      * method to get the bulk data
      *
@@ -131,7 +131,7 @@ class BulkAPIResponse extends CommonAPIResponse
     {
         return $this->bulkData;
     }
-    
+
     /**
      * method to set the bulk data
      *
@@ -141,7 +141,7 @@ class BulkAPIResponse extends CommonAPIResponse
     {
         $this->bulkData = $bulkData;
     }
-    
+
     /**
      * method to Get the response status
      *
@@ -149,10 +149,10 @@ class BulkAPIResponse extends CommonAPIResponse
      */
     public function getStatus()
     {
-        
+
         return $this->status;
     }
-    
+
     /**
      * method to Set the response status
      *
@@ -160,10 +160,10 @@ class BulkAPIResponse extends CommonAPIResponse
      */
     public function setStatus($status)
     {
-        
+
         $this->status = $status;
     }
-    
+
     /**
      * method to get the response information
      *
@@ -173,7 +173,7 @@ class BulkAPIResponse extends CommonAPIResponse
     {
         return $this->info;
     }
-    
+
     /**
      * method to set the response information
      *
@@ -185,7 +185,7 @@ class BulkAPIResponse extends CommonAPIResponse
             $this->info = new ResponseInfo($this->getResponseJSON()[APIConstants::INFO]);
         }
     }
-    
+
     /**
      * method to get the bulk entity responses
      *
