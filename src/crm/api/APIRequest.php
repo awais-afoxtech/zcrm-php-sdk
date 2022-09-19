@@ -1,13 +1,14 @@
 <?php
+
 namespace zcrmsdk\crm\api;
 
 use zcrmsdk\crm\utility\APIConstants;
 use zcrmsdk\crm\utility\ZCRMConfigUtil;
-use zcrmsdk\crm\utility\ZohoHTTPConnector;
-use zcrmsdk\crm\api\response\APIResponse;
-use zcrmsdk\crm\api\response\BulkAPIResponse;
-use zcrmsdk\crm\api\response\FileAPIResponse;
 use zcrmsdk\crm\exception\ZCRMException;
+use zcrmsdk\crm\api\response\APIResponse;
+use zcrmsdk\crm\utility\ZohoHTTPConnector;
+use zcrmsdk\crm\api\response\FileAPIResponse;
+use zcrmsdk\crm\api\response\BulkAPIResponse;
 
 /**
  * This class is to construct the API requests and initiate the request
@@ -17,39 +18,35 @@ use zcrmsdk\crm\exception\ZCRMException;
  */
 class APIRequest
 {
-    
-    private $url = null;
 
-    private $bulkurl = null;
-    
-    private $requestParams = array();
-    
-    private $requestHeaders = array();
-    
-    private $requestBody;
-    
-    private $requestMethod;
-    
-    private $apiKey = null;
-    
-    private $response = null;
-    
-    private $reponseInfo = null;
-    
+    private string $url = '';
+
+    private string $bulkurl = '';
+
+    private array $requestParams = array();
+
+    private array $requestHeaders = array();
+
+    private string $requestBody = '';
+
+    private string $requestMethod;
+
+    private string $apiKey = '';
+
+    private $response;
+
+    private array $responseInfo = [];
+
     private function __construct($apiHandler)
     {
-        if(str_contains($apiHandler->getUrlPath(), "content") || str_contains($apiHandler->getUrlPath(), "upload")
-           || str_contains($apiHandler->getUrlPath(), 'bulk-write'))
-        {
+        if (str_contains($apiHandler->getUrlPath(), "content") || str_contains($apiHandler->getUrlPath(), "upload")
+            || str_contains($apiHandler->getUrlPath(), 'bulk-write')) {
             self::setUrl($apiHandler->getUrlPath());
-        }
-        else 
-        {
+        } else {
             self::constructAPIUrl($apiHandler);
-            self::setUrl($this->url . $apiHandler->getUrlPath());
-            if ( ! str_starts_with($apiHandler->getUrlPath(), "http"))
-            {
-                self::setUrl("https://" . $this->url);
+            self::setUrl($this->url.$apiHandler->getUrlPath());
+            if ( ! str_starts_with($apiHandler->getUrlPath(), "http")) {
+                self::setUrl("https://".$this->url);
             }
         }
         self::setRequestParams($apiHandler->getRequestParams());
@@ -58,48 +55,44 @@ class APIRequest
         self::setRequestMethod($apiHandler->getRequestMethod());
         self::setApiKey($apiHandler->getApiKey());
     }
-    
+
     public static function getInstance($apiHandler): APIRequest
     {
         return new APIRequest($apiHandler);
     }
-    
+
     /**
      * Method to construct the API Url
      */
     public function constructAPIUrl($apiHandler): void
     {
         $hitSandbox = ZCRMConfigUtil::getConfigValue('sandbox');
-        $baseUrl = strcasecmp($hitSandbox, "true") == 0 ? str_replace('www', 'sandbox', ZCRMConfigUtil::getAPIBaseUrl()) : ZCRMConfigUtil::getAPIBaseUrl();
-        if($apiHandler->isBulk())
-        {
-            $this->url = $baseUrl . "/crm/bulk/" . ZCRMConfigUtil::getAPIVersion() . "/";
-        }
-        else 
-        {
-            $this->url = $baseUrl . "/crm/" . ZCRMConfigUtil::getAPIVersion() . "/";
+        $baseUrl = strcasecmp($hitSandbox, "true") == 0 ? str_replace('www', 'sandbox',
+            ZCRMConfigUtil::getAPIBaseUrl()) : ZCRMConfigUtil::getAPIBaseUrl();
+        if ($apiHandler->isBulk()) {
+            $this->url = $baseUrl."/crm/bulk/".ZCRMConfigUtil::getAPIVersion()."/";
+        } else {
+            $this->url = $baseUrl."/crm/".ZCRMConfigUtil::getAPIVersion()."/";
         }
         $this->url = str_replace(PHP_EOL, '', $this->url);
     }
-    
+
     private function authenticateRequest()
     {
         try {
             $accessToken = (new ZCRMConfigUtil())->getAccessToken();
-            if(strpos($this->url, "content")!== false || strpos($this->url, "upload")!== false || strpos($this->url, "bulk-write")!== false)
-            {
-                $this->requestHeaders[APIConstants::AUTHORIZATION] = " ".APIConstants::OAUTH_HEADER_PREFIX . $accessToken;
+            if (str_contains($this->url, "content") || str_contains($this->url, "upload")
+                || str_contains($this->url, "bulk-write")) {
+                $this->requestHeaders[APIConstants::AUTHORIZATION] = " ".APIConstants::OAUTH_HEADER_PREFIX.$accessToken;
+            } else {
+                $this->requestHeaders[APIConstants::AUTHORIZATION] = APIConstants::OAUTH_HEADER_PREFIX.$accessToken;
             }
-            else 
-            {
-                $this->requestHeaders[APIConstants::AUTHORIZATION] = APIConstants::OAUTH_HEADER_PREFIX . $accessToken;
-            }
-//             $this->requestHeaders[APIConstants::AUTHORIZATION] = APIConstants::OAUTH_HEADER_PREFIX . $accessToken;
+            //             $this->requestHeaders[APIConstants::AUTHORIZATION] = APIConstants::OAUTH_HEADER_PREFIX . $accessToken;
         } catch (ZCRMException $ex) {
             throw $ex;
         }
     }
-    
+
     /**
      * initiate the request and get the API response
      *
@@ -119,12 +112,13 @@ class APIRequest
             $response = $connector->fireRequest();
             $this->response = $response[0];
             $this->responseInfo = $response[1];
+
             return new APIResponse($this->response, $this->responseInfo[APIConstants::HTTP_CODE]);
         } catch (ZCRMException $e) {
             throw $e;
         }
     }
-    
+
     /**
      * initiate the request and get the API response
      *
@@ -145,44 +139,36 @@ class APIRequest
             $response = $connector->fireRequest();
             $this->response = $response[0];
             $this->responseInfo = $response[1];
+
             return new BulkAPIResponse($this->response, $this->responseInfo[APIConstants::HTTP_CODE]);
         } catch (ZCRMException $e) {
             throw $e;
         }
     }
-    
+
     public function uploadFile($filePath)
     {
-        try
-        {
+        try {
             $mime = null;
             $filename = basename($filePath);
-            if (function_exists('finfo_open'))
-            {
+            if (function_exists('finfo_open')) {
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mime = finfo_file($finfo, $filePath);
                 finfo_close($finfo);
-            }
-            elseif (function_exists('mime_content_type'))
-            {
+            } elseif (function_exists('mime_content_type')) {
                 $mime = mime_content_type($filePath);
-            }
-            else
-            {
+            } else {
                 $mime = "application/octet-stream";
             }
-            if (function_exists('curl_file_create'))
-            { // php 5.6+
+            if (function_exists('curl_file_create')) { // php 5.6+
                 $cFile = curl_file_create($filePath, $mime, $filename);
-            }
-            else
-            { //
-                $cFile = '@' . realpath($filePath, $mime, $filename);
+            } else { //
+                $cFile = '@'.realpath($filePath, $mime, $filename);
             }
             $post = array(
-                'file' => $cFile
+                'file' => $cFile,
             );
-            
+
             $connector = ZohoHTTPConnector::getInstance();
             $connector->setUrl($this->url);
             self::authenticateRequest();
@@ -194,19 +180,20 @@ class APIRequest
             $response = $connector->fireRequest();
             $this->response = $response[0];
             $this->responseInfo = $response[1];
+
             return new APIResponse($this->response, $this->responseInfo[APIConstants::HTTP_CODE]);
         } catch (ZCRMException $e) {
             throw $e;
         }
     }
-    
+
     public function uploadLinkAsAttachment($linkURL)
     {
         try {
             $post = array(
-                'attachmentUrl' => $linkURL
+                'attachmentUrl' => $linkURL,
             );
-            
+
             $connector = ZohoHTTPConnector::getInstance();
             $connector->setUrl($this->url);
             self::authenticateRequest();
@@ -217,12 +204,13 @@ class APIRequest
             $response = $connector->fireRequest();
             $this->response = $response[0];
             $this->responseInfo = $response[1];
+
             return new APIResponse($this->response, $this->responseInfo[APIConstants::HTTP_CODE]);
         } catch (ZCRMException $e) {
             throw $e;
         }
     }
-    
+
     public function downloadFile()
     {
         try {
@@ -233,127 +221,128 @@ class APIRequest
             $connector->setRequestParamsMap($this->requestParams);
             $connector->setRequestType($this->requestMethod);
             $response = $connector->downloadFile();
+
             return (new FileAPIResponse())->setFileContent($response[0], $response[1][APIConstants::HTTP_CODE]);
         } catch (ZCRMException $e) {
             throw $e;
         }
     }
-    
+
     /**
      * Get the request url
      *
-     * @return String
+     * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
-    
+
     /**
      * Set the request url
      *
-     * @param String $url
+     * @param  ?string  $url
      */
-    public function setUrl($url)
+    public function setUrl(?string $url): void
     {
-        $this->url = $url;
+        $this->url = $url ?? '';
     }
-    
+
     /**
      * Get the request parameters
      *
-     * @return Array
+     * @return array
      */
-    public function getRequestParams()
+    public function getRequestParams(): array
     {
         return $this->requestParams;
     }
-    
+
     /**
      * Set the request parameters
      *
-     * @param Array $requestParams
+     * @param  ?array  $requestParams
      */
-    public function setRequestParams($requestParams)
+    public function setRequestParams(?array $requestParams): void
     {
-        $this->requestParams = $requestParams;
+        $this->requestParams = $requestParams ?? [];
     }
-    
+
     /**
      * Get the request headers
      *
-     * @return Array
+     * @return array
      */
-    public function getRequestHeaders()
+    public function getRequestHeaders(): array
     {
         return $this->requestHeaders;
     }
-    
+
     /**
      * Set the request headers
      *
-     * @param Array $requestHeaders
+     * @param  ?array  $requestHeaders
      */
-    public function setRequestHeaders($requestHeaders)
+    public function setRequestHeaders(?array $requestHeaders): void
     {
-        $this->requestHeaders = $requestHeaders;
+        $this->requestHeaders = $requestHeaders ?? [];
     }
-    
+
     /**
      * Get the request body
      */
-    public function getRequestBody()
+    public function getRequestBody(): string
     {
         return $this->requestBody;
     }
-    
+
     /**
      * Set the request body
      *
      * @param $requestBody
      */
-    public function setRequestBody($requestBody)
+    public function setRequestBody($requestBody): void
     {
-        $this->requestBody = $requestBody;
+        $this->requestBody = $requestBody ?? '';
     }
-    
+
     /**
      * Get the request method
      *
      * @return String
      */
-    public function getRequestMethod()
+    public function getRequestMethod(): string
     {
         return $this->requestMethod;
     }
-    
+
     /**
      * Set the request method
      *
-     * @param String $requestMethod
+     * @param  ?string  $requestMethod
      */
-    public function setRequestMethod($requestMethod)
+    public function setRequestMethod(?string $requestMethod): void
     {
-        $this->requestMethod = $requestMethod;
+        $this->requestMethod = $requestMethod ?? '';
     }
-    
+
     /**
      * Get the API Key used in the input json data(like 'modules', 'data','layouts',..etc)
      *
      * @return String
      */
-    public function getApiKey()
+    public function getApiKey(): string
     {
         return $this->apiKey;
     }
-    
+
     /**
      * Set the API Key used in the input json data(like 'modules', 'data','layouts',..etc)
      *
-     * @param String $apiKey
+     * @param  ?string  $apiKey
      */
-    public function setApiKey($apiKey)
+    public function setApiKey(?string $apiKey): void
     {
-        $this->apiKey = $apiKey;
+        $this->apiKey = $apiKey ?? '';
     }
 }

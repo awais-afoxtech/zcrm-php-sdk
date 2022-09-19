@@ -157,7 +157,7 @@ class ZohoHTTPConnector
 
     public function setRequestParamsMap($params): void
     {
-        $this->requestParams = $params;
+        $this->requestParams = $params ?? [];
     }
 
     public function getRequestParamsMap(): array
