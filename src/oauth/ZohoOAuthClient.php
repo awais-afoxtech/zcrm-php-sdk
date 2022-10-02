@@ -12,7 +12,7 @@ use zcrmsdk\oauth\utility\ZohoOAuthTokens;
 class ZohoOAuthClient
 {
     
-    private mixed $zohoOAuthParams;
+    private $zohoOAuthParams;
     
     private static $zohoOAuthClient;
     
@@ -151,7 +151,7 @@ class ZohoOAuthClient
      *
      * @return mixed
      */
-    public function getZohoOAuthParams(): mixed
+    public function getZohoOAuthParams()
     {
         return $this->zohoOAuthParams;
     }

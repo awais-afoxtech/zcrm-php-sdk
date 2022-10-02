@@ -130,7 +130,7 @@ class ZohoHTTPConnector
         }
     }
 
-    public function getUrlParamsAsString($urlParams): array|string
+    public function getUrlParamsAsString($urlParams): string
     {
         $params_as_string = "";
         foreach ($urlParams as $key => $valueArray) {
