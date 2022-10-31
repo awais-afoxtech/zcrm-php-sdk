@@ -1,7 +1,7 @@
 {
-  "name": "fbmfox/zcrm-php-sdk",
+  "name": "awais-afoxtech/zcrm-php-sdk",
   "description": "Zoho CRM API SDK for PHP Forked from Zoho package",
-  "homepage": "https://github.com/asciisd/zcrm-php-sdk",
+  "homepage": "https://github.com/awais-afoxtech/zcrm-php-sdk",
   "authors": [
     {
       "name": "ASCIISD TEAM",
